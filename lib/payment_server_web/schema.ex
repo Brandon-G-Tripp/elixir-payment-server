@@ -2,13 +2,15 @@ defmodule PaymentServerWeb.Schema do
   use Absinthe.Schema
 
   # import types (graphql objects)
+  import_types PaymentServerWeb.Types.Currencies
   import_types PaymentServerWeb.Types.User
+  import_types PaymentServerWeb.Types.Currencies
 
   import_types PaymentServerWeb.Schema.Mutations.User
-  import_types PaymentServerWeb.Schema.Mutations.UserWallet
+  import_types PaymentServerWeb.Schema.Mutations.Wallet
 
   import_types PaymentServerWeb.Schema.Queries.User
-  import_types PaymentServerWeb.Schema.Queries.UserWallet
+  import_types PaymentServerWeb.Schema.Queries.Wallet
 
   query do 
     import_fields :user_queries

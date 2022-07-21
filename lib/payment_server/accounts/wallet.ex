@@ -12,9 +12,7 @@ defmodule PaymentServer.Accounts.Wallet do
   @available_fields [:currency, :user_id]
 
   def create_changeset(params) do 
-    IO.inspect(params, label: "params in create_changeset Wallet")
     changeset(%PaymentServer.Accounts.Wallet{}, params)
-    |> IO.inspect(label: "return of changeset wallet")
   end
 
   def changeset(wallet, attrs) do 

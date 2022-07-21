@@ -16,19 +16,19 @@ defmodule PaymentServer.Accounts do
     Actions.create(User, params)
   end
 
-  def all_user_wallets(params) do 
+  def all_wallets(params) do 
     IO.inspect(params, label: "params in all user wallets accoutn")
     {:ok, Actions.all(Wallet, params)}    
   end
 
-  def create_user_wallet(params) do 
-    # Actions.create(Wallet, params)
-    params
-    |> Wallet.create_changeset
-    |> Repo.insert
+  def create_wallet(params) do 
+    Actions.find_or_create(Wallet, params)
+    # params
+    # |> Wallet.create_changeset
+    # |> Repo.insert
   end
 
-  # def find_user_wallet_by_currency(params) do 
-  #   Actions.find(Wallet, params)
-  # end
+  def find_wallet_by_currency(params) do 
+    {:ok, wallet} = Actions.find(Wallet, params)
+  end
 end
