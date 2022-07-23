@@ -9,7 +9,12 @@ defmodule PaymentServer.Accounts do
   end
 
   def find(params) do 
-    Actions.find(User, params)
+    res = Actions.find(User, params)
+
+    case res do 
+      {:error, _} -> {:error, "User not found"}
+      _ -> res
+    end
   end
 
   def create_user(params) do 
@@ -23,12 +28,14 @@ defmodule PaymentServer.Accounts do
 
   def create_wallet(params) do 
     Actions.find_or_create(Wallet, params)
-    # params
-    # |> Wallet.create_changeset
-    # |> Repo.insert
   end
 
   def find_wallet_by_currency(params) do 
-    {:ok, wallet} = Actions.find(Wallet, params)
+    res = Actions.find(Wallet, params)
+
+    case res do 
+      {:error, _} -> {:error, "Wallet does not exist in this currency"}
+      _ -> res
+    end
   end
 end
