@@ -13,7 +13,7 @@ defmodule PaymentServerWeb.Schema.Queries.Wallet do
     field :wallet_by_currency, :wallet do 
       arg :id, :id
       arg :user_id, non_null(:id)
-      arg :currency, :currency
+      arg :currency, non_null(:currency)
 
       resolve &Resolvers.Wallet.find_wallet_by_currency/2
     end
