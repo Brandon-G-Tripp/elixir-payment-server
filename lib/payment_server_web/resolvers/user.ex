@@ -14,4 +14,5 @@ defmodule PaymentServerWeb.Resolvers.User do
   def create_user(params, _) do 
     Accounts.create_user(params)
   end
+
 end

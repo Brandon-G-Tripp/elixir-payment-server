@@ -4,12 +4,12 @@ defmodule PaymentServer.Accounts.Wallet do
 
   schema "wallets" do 
     field :currency, :string
-    field :value, :integer
+    field :value, :float
 
     belongs_to :user, PaymentServer.Accounts.User
   end
 
-  @available_fields [:currency, :user_id]
+  @available_fields [:currency, :user_id, :value]
 
   def create_changeset(params) do 
     changeset(%PaymentServer.Accounts.Wallet{}, params)

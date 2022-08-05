@@ -6,9 +6,17 @@ defmodule PaymentServerWeb.Schema.Mutations.Wallet do
   object :user_wallet_mutations do 
     field :create_wallet, :wallet do 
       arg :user_id, non_null(:id)
-      arg :currency, non_null(:string)
+      arg :currency, non_null(:currency)
 
       resolve &Resolvers.Wallet.create_wallet/2
+    end
+
+    field :add_money, :wallet do 
+      arg :user_id, non_null(:id)
+      arg :currency, non_null(:currency)
+      arg :deposit_amount, non_null(:float)
+
+      resolve &Resolvers.Wallet.add_money/2
     end
   end
 end
