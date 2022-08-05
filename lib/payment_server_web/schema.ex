@@ -4,17 +4,19 @@ defmodule PaymentServerWeb.Schema do
   # import types (graphql objects)
   import_types PaymentServerWeb.Types.Currencies
   import_types PaymentServerWeb.Types.User
-  import_types PaymentServerWeb.Types.Currencies
+  import_types PaymentServerWeb.Types.Balance
 
   import_types PaymentServerWeb.Schema.Mutations.User
   import_types PaymentServerWeb.Schema.Mutations.Wallet
 
   import_types PaymentServerWeb.Schema.Queries.User
   import_types PaymentServerWeb.Schema.Queries.Wallet
+  import_types PaymentServerWeb.Schema.Queries.TotalWorth
 
   query do 
     import_fields :user_queries
     import_fields :user_wallet_queries
+    import_fields :total_worth_queries
   end
   mutation do 
     import_fields :user_mutations
