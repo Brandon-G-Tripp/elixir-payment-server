@@ -22,12 +22,12 @@ defmodule PaymentServerWeb.Schema.Queries.WalletTest do
         name: "tester"
       })
 
-      assert {:ok, wallet_usd} = Accounts.create_wallet(%{
+      assert {:ok, _wallet_usd} = Accounts.create_wallet(%{
         currency: "USD",
         user_id: user.id
       })
 
-      assert {:ok, wallet_cad} = Accounts.create_wallet(%{
+      assert {:ok, _wallet_cad} = Accounts.create_wallet(%{
         currency: "CAD",
         user_id: user.id
       })
@@ -39,7 +39,7 @@ defmodule PaymentServerWeb.Schema.Queries.WalletTest do
       )
 
       [first_wallet | rest] = data["wallets"]
-      [second_wallet | rest] = rest
+      [second_wallet | _rest] = rest
 
       assert String.to_integer(first_wallet["userId"])== user.id
       assert String.to_integer(second_wallet["userId"])== user.id
@@ -63,9 +63,14 @@ defmodule PaymentServerWeb.Schema.Queries.WalletTest do
         name: "tester"
       })
 
-      assert {:ok, wallet} = Accounts.create_wallet(%{
+      assert {:ok, _wallet} = Accounts.create_wallet(%{
         user_id: user.id,
         currency: "USD"
+      })
+
+      assert {:ok, _wallet2} = Accounts.create_wallet(%{
+        user_id: user.id,
+        currency: "CAD"
       })
 
       assert {:ok, %{data: data}} = Absinthe.run(@wallet_by_currency_doc, Schema,
