@@ -5,7 +5,7 @@ defmodule PaymentServerWeb.Types.Wallet do
   @desc "Preferences for user"
   object :wallet do 
     field :currency, :string
-    field :value, :integer
+    field :value, :float
     field :user_id, :id
 
     field :user, :user, resolve: dataloader(PaymentServer.Accounts, :user)
