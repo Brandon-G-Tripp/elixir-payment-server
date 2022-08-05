@@ -15,9 +15,10 @@ defmodule PaymentServer.Application do
       # Start the PubSub system
       {Phoenix.PubSub, name: PaymentServer.PubSub},
       # Start the Endpoint (http/https)
-      PaymentServerWeb.Endpoint
+      PaymentServerWeb.Endpoint,
       # Start a worker by calling: PaymentServer.Worker.start_link(arg)
       # {PaymentServer.Worker, arg}
+      PaymentServer.ExchangeRatesMonitor
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
