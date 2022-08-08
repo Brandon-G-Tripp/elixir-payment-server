@@ -18,6 +18,6 @@ defmodule PaymentServer.Accounts.Wallet do
   def changeset(wallet, attrs) do 
     wallet 
     |> cast(attrs, @available_fields)
-    |> validate_required(@available_fields)
+    |> validate_required([:currency, :user_id])
   end
 end

@@ -1,6 +1,9 @@
 defmodule PaymentServer.Accounts do 
+  import Ecto.Changeset, only: [change: 2]
+
   alias EctoShorts.Actions
   alias Ecto.Query
+  alias Ecto.Multi
 
   alias PaymentServer.Repo
   alias PaymentServer.Accounts.User
@@ -76,14 +79,28 @@ defmodule PaymentServer.Accounts do
   end
 
   defp update_wallet_value( params, amount) do 
-    IO.inspect(amount)
     Actions.find_and_update(Wallet, params, value: amount)
-    |> IO.inspect(label: "return of update")
   end
 
   def add_money(%{currency: currency, user_id: user_id, deposit_amount: amount} = params) do 
     {:ok, wallet} = find_wallet_by_currency(%{user_id: user_id, currency: currency})
 
     update_wallet_value(%{user_id: user_id, currency: currency}, wallet.value + amount)
+  end
+
+  def send_money(params) do 
+    %{sending_user_id: sending_user_id, sender_currency: sender_currency, receiving_user_id: receiving_user_id, receiver_currency: receiver_currency, amount: amount} = params
+
+    with {:ok, sender_wallet} when sender_wallet.value >= amount  <- find_wallet_by_currency(%{user_id: sending_user_id, currency: sender_currency}),
+      {:ok, receiver_wallet} <- find_wallet_by_currency(%{user_id: receiving_user_id, currency: receiver_currency}) do 
+        Repo.transaction(fn -> 
+          Repo.update!(change(sender_wallet, value: sender_wallet.value - amount))
+          exchange_amount = get_value_in_new_currency(%{currency: sender_currency, value: amount},  receiver_currency)
+          Repo.update!(change(receiver_wallet, value: receiver_wallet.value + exchange_amount))
+        end)
+    else
+      _ -> {:error, "Insufficient Funds"}
+    end
+
   end
 end

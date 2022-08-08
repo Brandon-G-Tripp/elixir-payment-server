@@ -18,4 +18,8 @@ defmodule PaymentServerWeb.Resolvers.Wallet do
   def add_money(params, _) do 
     Accounts.add_money(params)
   end
+
+  def send_money(params, _) do 
+    Accounts.send_money(params)
+  end
 end
