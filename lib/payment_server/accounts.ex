@@ -2,8 +2,6 @@ defmodule PaymentServer.Accounts do
   import Ecto.Changeset, only: [change: 2]
 
   alias EctoShorts.Actions
-  alias Ecto.Query
-  alias Ecto.Multi
 
   alias PaymentServer.Repo
   alias PaymentServer.Accounts.User
@@ -15,7 +13,6 @@ defmodule PaymentServer.Accounts do
   end
 
   def find(params) do 
-    IO.inspect(params, label: "params in find func")
     res = Actions.find(User, params)
 
     case res do 
@@ -85,6 +82,8 @@ defmodule PaymentServer.Accounts do
   def add_money(%{currency: currency, user_id: user_id, deposit_amount: amount} = params) do 
     {:ok, wallet} = find_wallet_by_currency(%{user_id: user_id, currency: currency})
 
+    Absinthe.Subscription.publish(PaymentServerWeb.Endpoint, wallet, total_worth_change: "total_worth_change:#{wallet.user_id}/#{wallet.currency}")
+
     update_wallet_value(%{user_id: user_id, currency: currency}, wallet.value + amount)
   end
 
@@ -97,10 +96,18 @@ defmodule PaymentServer.Accounts do
           Repo.update!(change(sender_wallet, value: sender_wallet.value - amount))
           exchange_amount = get_value_in_new_currency(%{currency: sender_currency, value: amount},  receiver_currency)
           Repo.update!(change(receiver_wallet, value: receiver_wallet.value + exchange_amount))
+          {:ok, wallet } = find_wallet_by_currency(%{user_id: sending_user_id, currency: sender_currency})
+          wallet
         end)
+
+        {:ok, sender_wallet} = find_wallet_by_currency(%{user_id: sending_user_id, currency: sender_currency})
+        {:ok, receiver_wallet} = find_wallet_by_currency(%{user_id: receiving_user_id, currency: receiver_currency})
+        
+        Absinthe.Subscription.publish(PaymentServerWeb.Endpoint, sender_wallet, total_worth_change: "total_worth_change:#{sender_wallet.user_id}/#{sender_wallet.currency}")
+        Absinthe.Subscription.publish(PaymentServerWeb.Endpoint, receiver_wallet, total_worth_change: "total_worth_change:#{receiver_wallet.user_id}/#{receiver_wallet.currency}")
+        {:ok, sender_wallet}
     else
       _ -> {:error, "Insufficient Funds"}
     end
-
   end
 end
