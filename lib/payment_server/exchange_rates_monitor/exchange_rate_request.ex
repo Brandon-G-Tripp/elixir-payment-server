@@ -5,6 +5,7 @@ defmodule PaymentServer.ExchangeRatesMonitor.ExchangeRateRequest do
     for from_currency <- currencies, to_currency <- currencies, from_currency !== to_currency do 
       send_request(from_currency, to_currency)
       |> convert_response
+      |> publish_exchange_rate_change
       |> ExchangeRatesMonitor.update_rates_state
     end
   end
@@ -32,9 +33,29 @@ defmodule PaymentServer.ExchangeRatesMonitor.ExchangeRateRequest do
       to_currency: to_currency,
       rate: rate
     }
-
   end
 
+  def publish_exchange_rate_change(
+    %{from_currency: from, rate: rate, to_currency: to} = exchange_rate
+  ) do 
+    {_, exchange_rate} = Map.get_and_update(exchange_rate, :rate, fn current_val -> 
+      {current_val, String.to_float(current_val)}
+    end)
+
+    Absinthe.Subscription.publish(
+      PaymentServerWeb.Endpoint,
+      exchange_rate, 
+      exchange_rate_updated: "exchange_rate_updated:#{from}"
+    )
+
+    Absinthe.Subscription.publish(
+      PaymentServerWeb.Endpoint,
+      exchange_rate,
+      any_exchange_rate_updated: "exchange_rate_updated:any"
+    )
+
+    exchange_rate
+  end
 
 end
 
