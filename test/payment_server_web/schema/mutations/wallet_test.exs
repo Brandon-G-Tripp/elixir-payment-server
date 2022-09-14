@@ -6,7 +6,7 @@ defmodule PaymentServerWeb.Schema.Mutations.WalletTest do
   alias EctoShorts.Actions
 
   @create_wallet_doc """
-  mutation CreateWallet ($currency: String!, $userId: ID!) {
+  mutation CreateWallet ($currency: Currency!, $userId: ID!) {
     createWallet(currency: $currency, userId: $userId) {
       userId
       currency
