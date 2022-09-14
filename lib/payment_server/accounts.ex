@@ -17,15 +17,14 @@ defmodule PaymentServer.Accounts do
 
     case res do 
       {:error, _} -> {:error, "User not found"}
-      _ -> res
-    end
+      _ -> res 
+    end 
   end
-
-
+  
   def get_total_worth(%{user_id: user_id, currency: currency}) do 
     with {:ok, user} <- find(%{id: user_id}) do 
       wallets = Repo.all(Ecto.assoc(user, :wallets))
-      balance = reduce_balances(wallets, currency)
+      _balance = reduce_balances(wallets, currency) 
     end
   end
 
@@ -47,10 +46,10 @@ defmodule PaymentServer.Accounts do
   end
   defp get_value_in_new_currency(%{currency: wallet_currency, value: value} = _wallet, currency) do 
     %{rate: exchange_rate} = ExchangeRatesMonitor.get_exchange_rate(wallet_currency, currency)
-    exchange_rate_float = String.to_float(exchange_rate)
+
     case value do 
       0 -> 0
-      _ -> exchange_rate_float * value
+      _ -> exchange_rate * value
     end
   end
 
