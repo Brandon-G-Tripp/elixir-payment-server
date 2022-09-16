@@ -26,7 +26,7 @@ defmodule PaymentServerWeb.Schema.Queries.UserTest do
         name: "tester1",
       })
 
-      assert {:ok, user2} = Accounts.create_user(%{
+      assert {:ok, _user2} = Accounts.create_user(%{
         email: "test2@test.com",
         name: "tester2",
       })
