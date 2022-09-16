@@ -35,6 +35,7 @@ defmodule PaymentServerWeb.Schema.Subscriptions.UserTest do
         user_id: user.id
       })
 
+      updated_wallet_amount = 10.0
       user_id = user.id
 
       ref = push_doc socket, @total_worth_change_sub_doc,
@@ -51,6 +52,34 @@ defmodule PaymentServerWeb.Schema.Subscriptions.UserTest do
       assert_reply ref, :ok, reply
 
       user_id_string = to_string(user_id)
+
+      assert %{
+        data: %{"addMoney" => %{
+          "currency" => "USD",
+          "userId" => user_id,
+          "value" => ^updated_wallet_amount
+        }}
+      } = reply
+
+      assert_push "subscription:data", data
+
+      assert %{
+        subscriptionId: ^subscription_id,
+        result: %{
+          data: %{
+            "totalWorthChange" => %{
+              "userId" => ^user_id_string,
+              "currency" => "USD",
+              "value" => value
+            }
+          }
+        }
+      } = data
+      
+      assert {:ok, wallet} = Accounts.find_wallet_by_currency(%{currency: "USD", user_id: user.id})
+
+      assert wallet.value === updated_wallet_amount
+
     end
   end
   
