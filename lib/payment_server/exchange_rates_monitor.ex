@@ -6,11 +6,18 @@ defmodule PaymentServer.ExchangeRatesMonitor do
 
   @default_name ExchangeRatesMonitor
   @available_currencies ["USD", "CAD", "MXN", "GBP"]
+  @initial_test_rates %{
+    "CAD/USD" => %{
+      from_currency: "CAD",
+      to_currency: "USD",
+      rate: 1.5
+    }
+  }
 
   # Client
 
   def start_link(opts \\ []) do 
-    state = Keyword.get(opts, :state, %{})
+    state = Keyword.get(opts, :state, @initial_test_rates)
     opts = Keyword.put_new(opts, :name, @default_name)
 
     GenServer.start_link(ExchangeRatesMonitor, state, opts)
@@ -24,11 +31,15 @@ defmodule PaymentServer.ExchangeRatesMonitor do
     GenServer.call(server, {:get_exchange_rate, from_currency, to_currency})
   end
 
+  def get_all_rates(server \\ @default_name) do 
+    GenServer.call(server, :get_all_rates)
+  end
+
   # Server
 
   @impl true
   def init(state) do 
-    schedule_exchange_rate_update()
+    # schedule_exchange_rate_update()
     {:ok, state}
   end
 
@@ -51,6 +62,11 @@ defmodule PaymentServer.ExchangeRatesMonitor do
   def handle_call({:get_exchange_rate, from_currency, to_currency}, _from, state) do 
     res = Map.get(state, "#{from_currency}/#{to_currency}")
     {:reply, res, state}
+  end
+
+  @impl true
+  def handle_call(:get_all_rates, _from, state) do 
+    {:reply, state, state}
   end
 
   # Private Functions
