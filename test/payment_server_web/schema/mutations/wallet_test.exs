@@ -3,7 +3,6 @@ defmodule PaymentServerWeb.Schema.Mutations.WalletTest do
 
   alias PaymentServerWeb.Schema
   alias PaymentServer.Accounts
-  alias EctoShorts.Actions
 
   @create_wallet_doc """
   mutation CreateWallet ($currency: Currency!, $userId: ID!) {

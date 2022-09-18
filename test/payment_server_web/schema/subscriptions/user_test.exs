@@ -30,7 +30,7 @@ defmodule PaymentServerWeb.Schema.Subscriptions.UserTest do
         name: "test"
       })
 
-      assert {:ok, usd_wallet} = Accounts.create_wallet(%{
+      assert {:ok, _usd_wallet} = Accounts.create_wallet(%{
         currency: "USD",
         user_id: user.id
       })
@@ -56,7 +56,7 @@ defmodule PaymentServerWeb.Schema.Subscriptions.UserTest do
       assert %{
         data: %{"addMoney" => %{
           "currency" => "USD",
-          "userId" => user_id,
+          "userId" => ^user_id_string,
           "value" => ^updated_wallet_amount
         }}
       } = reply
@@ -70,7 +70,7 @@ defmodule PaymentServerWeb.Schema.Subscriptions.UserTest do
             "totalWorthChange" => %{
               "userId" => ^user_id_string,
               "currency" => "USD",
-              "value" => value
+              "value" => _value
             }
           }
         }
