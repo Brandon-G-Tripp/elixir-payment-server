@@ -3,6 +3,7 @@ defmodule PaymentServerWeb.Schema.Queries.TotalWorthTest do
 
   alias PaymentServerWeb.Schema
   alias PaymentServer.Accounts
+  alias PaymentServer.ExchangeRatesMonitor
 
   @total_worth_doc """
   query TotalWorth($currency: Currency!, $userId: ID!) {
@@ -50,10 +51,14 @@ defmodule PaymentServerWeb.Schema.Queries.TotalWorthTest do
         }
       )
 
+      %{from_currency: _, to_currency: _, rate: exchange_rate}= ExchangeRatesMonitor.get_exchange_rate("CAD", "USD")
+
+      expected_wallet_sum = 10.0 + (20.0 * exchange_rate)
+
       currency = data["totalWorth"]["currency"]
       amount = data["totalWorth"]["amount"]
 
-      assert amount === 40.0
+      assert amount === expected_wallet_sum
       assert currency === "USD"
     end
   end
