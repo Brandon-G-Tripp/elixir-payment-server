@@ -11,6 +11,11 @@ defmodule PaymentServer.ExchangeRatesMonitor do
       from_currency: "CAD",
       to_currency: "USD",
       rate: 1.5
+    },
+    "USD/CAD" => %{
+      from_currency: "USD",
+      to_currency: "CAD",
+      rate: 2.3
     }
   }
 
