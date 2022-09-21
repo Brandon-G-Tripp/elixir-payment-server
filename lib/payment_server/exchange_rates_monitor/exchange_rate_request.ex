@@ -3,7 +3,9 @@ defmodule PaymentServer.ExchangeRatesMonitor.ExchangeRateRequest do
 
   def update_rates(currencies) do 
     for from_currency <- currencies, to_currency <- currencies, from_currency !== to_currency do 
-      send_request(from_currency, to_currency)
+      exchange_rate = send_request(from_currency, to_currency)
+
+      exchange_rate
       |> convert_response
       |> publish_exchange_rate_change
       |> ExchangeRatesMonitor.update_rates_state
@@ -15,7 +17,7 @@ defmodule PaymentServer.ExchangeRatesMonitor.ExchangeRateRequest do
     case HTTPoison.get(url) do 
       {:ok, %HTTPoison.Response{status_code: 200, body: body}} -> Jason.decode(body)
       {:ok, %HTTPoison.Response{status_code: 404}} -> IO.puts "Not found"
-      {:error, %HTTPoison.Error{reason: reason}} -> IO.inspect reason
+      {:error, %HTTPoison.Error{reason: reason}} -> IO.puts reason
     end
   end
 

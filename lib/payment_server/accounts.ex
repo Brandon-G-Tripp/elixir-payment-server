@@ -33,9 +33,7 @@ defmodule PaymentServer.Accounts do
     {:ok, %{amount: sum, currency: currency, timestamp: DateTime.utc_now |> DateTime.to_string}}
   end
   defp reduce_balances([current_wallet | tail], currency, sum) do 
-    value_in_new_currency = 
-      current_wallet 
-      |> get_value_in_new_currency(currency)
+    value_in_new_currency = get_value_in_new_currency(current_wallet, currency)
     reduce_balances(tail, currency, sum + value_in_new_currency)
   end
 
@@ -74,7 +72,7 @@ defmodule PaymentServer.Accounts do
     end
   end
 
-  defp update_wallet_value( params, amount) do 
+  defp update_wallet_value(params, amount) do 
     Actions.find_and_update(Wallet, params, value: amount)
   end
 
@@ -87,7 +85,13 @@ defmodule PaymentServer.Accounts do
   end
 
   def send_money(params) do 
-    %{sending_user_id: sending_user_id, sender_currency: sender_currency, receiving_user_id: receiving_user_id, receiver_currency: receiver_currency, amount: amount} = params
+    %{
+      sending_user_id: sending_user_id,
+      sender_currency: sender_currency,
+      receiving_user_id: receiving_user_id,
+      receiver_currency: receiver_currency,
+      amount: amount
+    } = params
 
     with {:ok, sender_wallet} when sender_wallet.value >= amount  <- find_wallet_by_currency(%{user_id: sending_user_id, currency: sender_currency}),
       {:ok, receiver_wallet} <- find_wallet_by_currency(%{user_id: receiving_user_id, currency: receiver_currency}) do 

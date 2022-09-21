@@ -41,8 +41,8 @@ defmodule PaymentServerWeb.Schema.Queries.WalletTest do
       [first_wallet | rest] = data["wallets"]
       [second_wallet | _rest] = rest
 
-      assert String.to_integer(first_wallet["userId"])== user.id
-      assert String.to_integer(second_wallet["userId"])== user.id
+      assert String.to_integer(first_wallet["userId"]) == user.id
+      assert String.to_integer(second_wallet["userId"]) == user.id
     end
   end
 

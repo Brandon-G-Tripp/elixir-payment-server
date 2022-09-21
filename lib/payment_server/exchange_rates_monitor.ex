@@ -44,7 +44,7 @@ defmodule PaymentServer.ExchangeRatesMonitor do
 
   @impl true
   def init(state) do 
-    # schedule_exchange_rate_update()
+    schedule_exchange_rate_update()
     {:ok, state}
   end
 
@@ -58,7 +58,12 @@ defmodule PaymentServer.ExchangeRatesMonitor do
 
   @impl true
   def handle_cast({:update_rate, ex_rate}, state) do
-    %{from_currency: from_currency, to_currency: to_currency, rate: _rate} = ex_rate
+    %{
+      from_currency: from_currency,
+      to_currency: to_currency,
+      rate: _rate
+    } = ex_rate
+    
     res = Map.put(state, "#{from_currency}/#{to_currency}", ex_rate)
     {:noreply, res}
   end
