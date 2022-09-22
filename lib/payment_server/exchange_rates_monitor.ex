@@ -81,7 +81,7 @@ defmodule PaymentServer.ExchangeRatesMonitor do
 
   # Private Functions
 
-  defp schedule_exchange_rate_update() do 
+  defp schedule_exchange_rate_update do 
     Process.send_after(self(), :work, 5000)
   end
 end

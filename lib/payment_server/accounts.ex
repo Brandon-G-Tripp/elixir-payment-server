@@ -30,7 +30,7 @@ defmodule PaymentServer.Accounts do
 
   defp reduce_balances(wallets, currency, sum \\ 0)
   defp reduce_balances([], currency, sum) do 
-    {:ok, %{amount: sum, currency: currency, timestamp: DateTime.utc_now |> DateTime.to_string}}
+    {:ok, %{amount: sum, currency: currency, timestamp: DateTime.to_string(DateTime.utc_now)}}
   end
   defp reduce_balances([current_wallet | tail], currency, sum) do 
     value_in_new_currency = get_value_in_new_currency(current_wallet, currency)
