@@ -3,80 +3,34 @@ defmodule PaymentServer.ExchangeRatesMonitor do
 
   alias PaymentServer.ExchangeRatesMonitor
   alias PaymentServer.ExchangeRatesMonitor.ExchangeRateRequest
+  alias PaymentServer.ExchangeRatesMonitor.ExchangeRateState
 
   @default_name ExchangeRatesMonitor
   @available_currencies ["USD", "CAD", "MXN", "GBP"]
-  @initial_test_rates %{
-    "CAD/USD" => %{
-      from_currency: "CAD",
-      to_currency: "USD",
-      rate: 1.5
-    },
-    "USD/CAD" => %{
-      from_currency: "USD",
-      to_currency: "CAD",
-      rate: 2.3
-    }
-  }
 
   # Client
 
   def start_link(opts \\ []) do 
-    state = Keyword.get(opts, :state, @initial_test_rates)
+    state = Keyword.get(opts, :state, @available_currencies)
     opts = Keyword.put_new(opts, :name, @default_name)
 
     GenServer.start_link(ExchangeRatesMonitor, state, opts)
   end
 
-  def update_rates_state(ex_rate, server \\ @default_name) do 
-    GenServer.cast(server, {:update_rate, ex_rate})
-  end
-
-  def get_exchange_rate(from_currency, to_currency, server \\ @default_name) do 
-    GenServer.call(server, {:get_exchange_rate, from_currency, to_currency})
-  end
-
-  def get_all_rates(server \\ @default_name) do 
-    GenServer.call(server, :get_all_rates)
-  end
-
   # Server
 
   @impl true
-  def init(state) do 
+  def init(currencies) do 
     schedule_exchange_rate_update()
-    {:ok, state}
+    {:ok, currencies}
   end
 
   @impl true
-  def handle_info(:work, state) do 
+  def handle_info(:work, currencies) do 
     # call api here
-    ExchangeRateRequest.update_rates(@available_currencies)
+    ExchangeRatesMonitor.update_rates(@available_currencies)
     schedule_exchange_rate_update()
-    {:noreply, state}
-  end
-
-  @impl true
-  def handle_cast({:update_rate, ex_rate}, state) do
-    %{
-      from_currency: from_currency,
-      to_currency: to_currency,
-      rate: _rate
-    } = ex_rate
-    
-    res = Map.put(state, "#{from_currency}/#{to_currency}", ex_rate)
-    {:noreply, res}
-  end
-
-  @impl true
-  def handle_call({:get_exchange_rate, from_currency, to_currency}, _from, state) do 
-    res = Map.get(state, "#{from_currency}/#{to_currency}")
-    {:reply, res, state}
-  end
-
-  @impl true
-  def handle_call(:get_all_rates, _from, state) do 
-    {:reply, state, state}
+    {:noreply, currencies}
   end
 
   # Private Functions
@@ -84,4 +38,13 @@ defmodule PaymentServer.ExchangeRatesMonitor do
   defp schedule_exchange_rate_update do 
     Process.send_after(self(), :work, 5000)
   end
+  
+  def update_rates(currencies) do 
+    for from_currency <- currencies, to_currency <- currencies, from_currency !== to_currency do 
+      {from_currency, to_currency}
+      |> ExchangeRateRequest.update_rate
+      |> ExchangeRateState.update_exchange_rate
+    end
+  end
+
 end
