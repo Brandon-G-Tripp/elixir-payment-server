@@ -14,7 +14,7 @@ defmodule PaymentServerWeb.Schema.Mutations.Wallet do
     field :add_money, :wallet do 
       arg :user_id, non_null(:id)
       arg :currency, non_null(:currency)
-      arg :deposit_amount, non_null(:float)
+      arg :deposit_amount, non_null(:integer)
 
       resolve &Resolvers.Wallet.add_money/2
     end
@@ -24,7 +24,7 @@ defmodule PaymentServerWeb.Schema.Mutations.Wallet do
       arg :receiving_user_id, non_null(:id)
       arg :sender_currency, non_null(:currency)
       arg :receiver_currency, non_null(:currency)
-      arg :amount, non_null(:float)
+      arg :amount, non_null(:integer)
 
       resolve &Resolvers.Wallet.send_money/2
     end
