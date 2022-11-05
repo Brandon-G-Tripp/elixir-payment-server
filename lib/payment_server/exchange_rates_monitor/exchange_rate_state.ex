@@ -16,7 +16,7 @@ defmodule PaymentServer.ExchangeRatesMonitor.ExchangeRateState do
   }
 
   def start_link(_opts) do 
-    Agent.start_link(fn -> %{} end, name: __MODULE__)
+    Agent.start_link(fn -> @initial_test_rates end, name: __MODULE__)
   end
 
   def update_exchange_rate(ex_rate) do 
