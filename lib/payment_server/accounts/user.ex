@@ -20,7 +20,7 @@ defmodule PaymentServer.Accounts.User do
   @doc false 
   def changeset(%PaymentServer.Accounts.User{} = user, attrs) do 
     user
-    |> cast(attrs, @available_fields)
+    |> EctoShorts.CommonChanges.preload_change_assoc(attrs, @available_fields)
     |> validate_required(@available_fields)
     |> EctoShorts.CommonChanges.preload_changeset_assoc(:wallets)
     |> cast_assoc(:wallets)
