@@ -3,7 +3,7 @@ defmodule PaymentServerWeb.Schema.Queries.TotalWorthTest do
 
   alias PaymentServerWeb.Schema
   alias PaymentServer.Accounts
-  alias PaymentServer.ExchangeRatesMonitor
+  alias PaymentServer.ExchangeRatesMonitor.ExchangeRateState
 
   @total_worth_doc """
   query TotalWorth($currency: Currency!, $userId: ID!) {
@@ -35,13 +35,13 @@ defmodule PaymentServerWeb.Schema.Queries.TotalWorthTest do
       assert {:ok, _wallet_amount_usd} = Accounts.add_money(%{
         currency: "USD",
         user_id: user.id,
-        deposit_amount: 10.0
+        deposit_amount: 10
       })
 
       assert {:ok, _wallet_amount_cad} = Accounts.add_money(%{
         currency: "CAD",
         user_id: user.id,
-        deposit_amount: 20.0
+        deposit_amount: 20
       })
 
       assert {:ok,  %{data: data} } = Absinthe.run(@total_worth_doc, Schema,
@@ -51,9 +51,9 @@ defmodule PaymentServerWeb.Schema.Queries.TotalWorthTest do
         }
       )
 
-      %{from_currency: _, to_currency: _, rate: exchange_rate}= ExchangeRatesMonitor.get_exchange_rate("CAD", "USD")
+      %{from_currency: _, to_currency: _, rate: exchange_rate} = ExchangeRateState.get_exchange_rate("CAD", "USD")
 
-      expected_wallet_sum = 10.0 + (20.0 * exchange_rate)
+      expected_wallet_sum = 10 + floor(20 * exchange_rate)
 
       currency = data["totalWorth"]["currency"]
       amount = data["totalWorth"]["amount"]
