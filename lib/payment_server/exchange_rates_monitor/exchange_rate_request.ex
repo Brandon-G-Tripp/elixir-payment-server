@@ -1,18 +1,15 @@
 defmodule PaymentServer.ExchangeRatesMonitor.ExchangeRateRequest do 
   alias PaymentServer.ExchangeRatesMonitor 
 
-  def update_rates(currencies) do 
-    for from_currency <- currencies, to_currency <- currencies, from_currency !== to_currency do 
-      exchange_rate = send_request(from_currency, to_currency)
+  def update_rate(currency_pair) do 
 
-      exchange_rate
+      currency_pair
+      |> send_request
       |> convert_response
       |> publish_exchange_rate_change
-      |> ExchangeRatesMonitor.update_rates_state
-    end
   end
 
-  def send_request(from_currency, to_currency) do 
+  def send_request({from_currency, to_currency}) do 
     url = "http://localhost:4001/query?function=CURRENCY_EXCHANGE_RATE&from_currency=#{from_currency}&to_currency=#{to_currency}&apikey=demo"
     case HTTPoison.get(url) do 
       {:ok, %HTTPoison.Response{status_code: 200, body: body}} -> Jason.decode(body)
@@ -58,6 +55,5 @@ defmodule PaymentServer.ExchangeRatesMonitor.ExchangeRateRequest do
 
     exchange_rate
   end
-
 end
 
