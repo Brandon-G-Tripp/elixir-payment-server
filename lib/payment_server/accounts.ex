@@ -6,7 +6,7 @@ defmodule PaymentServer.Accounts do
   alias PaymentServer.Repo
   alias PaymentServer.Accounts.User
   alias PaymentServer.Accounts.Wallet
-  alias PaymentServer.ExchangeRatesMonitor
+  alias PaymentServer.ExchangeRatesMonitor.ExchangeRateState
 
   def all do 
     Actions.all(User)
@@ -43,11 +43,11 @@ defmodule PaymentServer.Accounts do
     value
   end
   defp get_value_in_new_currency(%{currency: wallet_currency, value: value} = _wallet, currency) do 
-    %{rate: exchange_rate} = ExchangeRatesMonitor.get_exchange_rate(wallet_currency, currency)
+    %{rate: exchange_rate} = ExchangeRateState.get_exchange_rate(wallet_currency, currency)
 
     case value do 
       0 -> 0
-      _ -> exchange_rate * value
+      _ -> floor( exchange_rate * value )
     end
   end
 
