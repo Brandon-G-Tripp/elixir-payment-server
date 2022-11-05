@@ -14,7 +14,7 @@ defmodule PaymentServerWeb.Schema.Subscriptions.UserTest do
   """
 
   @add_money_doc """
-  mutation AddMoney($currency: Currency!, $userId: ID!, $depositAmount: Float!) {
+  mutation AddMoney($currency: Currency!, $userId: ID!, $depositAmount: Int!) {
     addMoney(currency: $currency, userId: $userId, depositAmount: $depositAmount) {
       currency 
       userId
@@ -35,7 +35,7 @@ defmodule PaymentServerWeb.Schema.Subscriptions.UserTest do
         user_id: user.id
       })
 
-      updated_wallet_amount = 10.0
+      updated_wallet_amount = 10
       user_id = user.id
 
       ref = push_doc socket, @total_worth_change_sub_doc,
@@ -46,7 +46,7 @@ defmodule PaymentServerWeb.Schema.Subscriptions.UserTest do
       ref = push_doc socket, @add_money_doc, variables: %{
         "userId" => user_id,
         "currency" => "USD",
-        "depositAmount" => 10.0
+        "depositAmount" => 10
       }
 
       assert_reply ref, :ok, reply
