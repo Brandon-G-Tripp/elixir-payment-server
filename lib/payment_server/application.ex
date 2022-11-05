@@ -19,7 +19,8 @@ defmodule PaymentServer.Application do
       {Absinthe.Subscription, [PaymentServerWeb.Endpoint]},
       # Start a worker by calling: PaymentServer.Worker.start_link(arg)
       # {PaymentServer.Worker, arg}
-      PaymentServer.ExchangeRatesMonitor
+      PaymentServer.ExchangeRatesMonitor,
+      PaymentServer.ExchangeRatesMonitor.ExchangeRateState
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
