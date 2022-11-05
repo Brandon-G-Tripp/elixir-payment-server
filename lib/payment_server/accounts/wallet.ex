@@ -4,7 +4,7 @@ defmodule PaymentServer.Accounts.Wallet do
 
   schema "wallets" do 
     field :currency, :string
-    field :value, :float
+    field :value, :integer
 
     belongs_to :user, PaymentServer.Accounts.User
   end
