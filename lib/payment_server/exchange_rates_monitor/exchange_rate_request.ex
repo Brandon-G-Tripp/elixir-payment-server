@@ -1,13 +1,15 @@
 defmodule PaymentServer.ExchangeRatesMonitor.ExchangeRateRequest do 
-  alias PaymentServer.ExchangeRatesMonitor 
   alias PaymentServerWeb.GraphqlHelpers.Publishing
 
   def update_rate(currency_pair) do 
-
-      currency_pair
-      |> send_request
-      |> convert_response
-      |> Publishing.publish_exchange_rate_change
+    case send_request(currency_pair) do 
+      {:ok, rate} ->
+        rate
+        |> convert_response
+        |> Publishing.publish_exchange_rate_change
+      {:error, message} ->
+        message
+    end
   end
 
   def send_request({from_currency, to_currency}) do 
@@ -21,7 +23,6 @@ defmodule PaymentServer.ExchangeRatesMonitor.ExchangeRateRequest do
 
 
   def convert_response(resp) do 
-    {:ok, resp} = resp
     %{"Realtime Currency Exchange Rate" => %{
       "1. From_Currency Code" => from_currency,
       "3. To_Currency Code" => to_currency,
