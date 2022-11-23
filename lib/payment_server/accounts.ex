@@ -7,6 +7,7 @@ defmodule PaymentServer.Accounts do
   alias PaymentServer.Accounts.User
   alias PaymentServer.Accounts.Wallet
   alias PaymentServer.ExchangeRatesMonitor.ExchangeRateState
+  alias PaymentServerWeb.GraphqlHelpers.Publishing
 
   def all do 
     Actions.all(User)
@@ -105,9 +106,10 @@ defmodule PaymentServer.Accounts do
 
         {:ok, sender_wallet} = find_wallet_by_currency(%{user_id: sending_user_id, currency: sender_currency})
         {:ok, receiver_wallet} = find_wallet_by_currency(%{user_id: receiving_user_id, currency: receiver_currency})
-        
-        Absinthe.Subscription.publish(PaymentServerWeb.Endpoint, sender_wallet, total_worth_change: "total_worth_change:#{sender_wallet.user_id}/#{sender_wallet.currency}")
-        Absinthe.Subscription.publish(PaymentServerWeb.Endpoint, receiver_wallet, total_worth_change: "total_worth_change:#{receiver_wallet.user_id}/#{receiver_wallet.currency}")
+
+        Publishing.publish_total_worth_change(sender_wallet)       
+        Publishing.publish_total_worth_change(receiver_wallet)
+         
         {:ok, sender_wallet}
     else
       _ -> {:error, "Insufficient Funds"}
