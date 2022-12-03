@@ -14,10 +14,11 @@ defmodule PaymentServer.ExchangeRatesMonitor.ExchangeRateRequest do
 
   def send_request({from_currency, to_currency}) do 
     url = "http://localhost:4001/query?function=CURRENCY_EXCHANGE_RATE&from_currency=#{from_currency}&to_currency=#{to_currency}&apikey=demo"
-    case HTTPoison.get(url) do 
-      {:ok, %HTTPoison.Response{status_code: 200, body: body}} -> Jason.decode(body)
-      {:ok, %HTTPoison.Response{status_code: 404}} -> IO.puts "Not found"
-      {:error, %HTTPoison.Error{reason: reason}} -> IO.puts reason
+    with {:ok, %HTTPoison.Response{status_code: 200, body: body}} <- HTTPoison.get(url),
+         {:ok, resp_body} <- Jason.decode(body) do
+      {:ok, resp_body}
+    else
+      error -> error
     end
   end
 
