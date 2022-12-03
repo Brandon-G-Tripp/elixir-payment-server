@@ -10,8 +10,5 @@ defmodule PaymentServerWeb.Schema.Mutations.User do
 
       resolve &Resolvers.User.create_user/2
     end
-
-
-    # send money mutations
   end
 end

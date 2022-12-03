@@ -29,7 +29,7 @@ defmodule PaymentServer.ExchangeRatesMonitor.ExchangeRateRequest do
       "5. Exchange Rate" => rate
     }} = resp
 
-    _ex_rate = %{
+   %{
       from_currency: from_currency,
       to_currency: to_currency,
       rate: rate
