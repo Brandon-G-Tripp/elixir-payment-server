@@ -94,14 +94,15 @@ defmodule PaymentServer.Accounts do
       amount: amount
     } = params
 
-    with {:ok, sender_wallet} when sender_wallet.value >= amount  <- find_wallet_by_currency(%{user_id: sending_user_id, currency: sender_currency}),
+    with {:ok, sender_wallet} <- find_wallet_by_currency(%{user_id: sending_user_id, currency: sender_currency}),
+      true <- sender_wallet.value >= amount,
       {:ok, receiver_wallet} <- find_wallet_by_currency(%{user_id: receiving_user_id, currency: receiver_currency}) do 
         Repo.transaction(fn -> 
-          Repo.update!(change(sender_wallet, value: sender_wallet.value - amount))
+          {:ok, _sender_wallet} = Repo.update(change(sender_wallet, value: sender_wallet.value - amount))
           exchange_amount = get_value_in_new_currency(%{currency: sender_currency, value: amount},  receiver_currency)
-          Repo.update!(change(receiver_wallet, value: receiver_wallet.value + exchange_amount))
-          {:ok, wallet } = find_wallet_by_currency(%{user_id: sending_user_id, currency: sender_currency})
-          wallet
+          {:ok, receiver_wallet} = Repo.update(change(receiver_wallet, value: receiver_wallet.value + exchange_amount))
+
+          receiver_wallet
         end)
 
         {:ok, sender_wallet} = find_wallet_by_currency(%{user_id: sending_user_id, currency: sender_currency})
@@ -112,7 +113,8 @@ defmodule PaymentServer.Accounts do
          
         {:ok, sender_wallet}
     else
-      _ -> {:error, "Insufficient Funds"}
+      {:error, error} -> error
+      false -> {:error, "Insufficient Funds"}
     end
   end
 end
