@@ -80,7 +80,7 @@ defmodule PaymentServer.Accounts do
   def add_money(%{currency: currency, user_id: user_id, deposit_amount: amount} = params) do 
     {:ok, wallet} = find_wallet_by_currency(%{user_id: user_id, currency: currency})
 
-    Absinthe.Subscription.publish(PaymentServerWeb.Endpoint, wallet, total_worth_change: "total_worth_change:#{wallet.user_id}/#{wallet.currency}")
+    Publishing.publish_total_worth_change(wallet)
 
     update_wallet_value(%{user_id: user_id, currency: currency}, wallet.value + amount)
   end
