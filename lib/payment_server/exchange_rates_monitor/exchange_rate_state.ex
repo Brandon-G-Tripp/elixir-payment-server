@@ -37,4 +37,8 @@ defmodule PaymentServer.ExchangeRatesMonitor.ExchangeRateState do
     Agent.get(__MODULE__, &Map.get(&1, "#{from_currency}/#{to_currency}"))
   end
 
+  def get_all_rates do 
+    Agent.get(__MODULE__, & &1)
+  end
+
 end
