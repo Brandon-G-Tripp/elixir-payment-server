@@ -27,24 +27,31 @@ defmodule PaymentServer.ExchangeRatesMonitor do
 
   @impl true
   def handle_info(:work, currencies) do 
-    # call api here
     ExchangeRatesMonitor.update_rates(@available_currencies)
     schedule_exchange_rate_update()
     {:noreply, currencies}
+  end
+  
+  def update_rates(currencies) do 
+    Task.async_stream(currencies,
+      fn currency ->
+        Task.async_stream(currencies, ExchangeRatesMonitor, :update_single_rate, [currency])
+      end
+    )
+  end
+
+  def update_single_rate(currency, el) do 
+    if currency !== el do
+    {currency, el}
+      |> ExchangeRateRequest.update_rate
+      |> ExchangeRateState.update_exchange_rate
+    end
   end
 
   # Private Functions
 
   defp schedule_exchange_rate_update do 
     Process.send_after(self(), :work, 5000)
-  end
-  
-  def update_rates(currencies) do 
-    for from_currency <- currencies, to_currency <- currencies, from_currency !== to_currency do 
-      {from_currency, to_currency}
-      |> ExchangeRateRequest.update_rate
-      |> ExchangeRateState.update_exchange_rate
-    end
   end
 
 end
