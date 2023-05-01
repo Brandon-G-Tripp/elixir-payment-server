@@ -1,6 +1,6 @@
 # PaymentServer
 
-To Start the local AlphaVantage Exchange Rate Server with Docker:
+To Start the local AlphaVantage Exchange Rate Server from the Docker image:
 
   * Make sure docker is installed 
   * Run `docker pull mikaak/alpha-vantage:latest` to pull the image into Docker
